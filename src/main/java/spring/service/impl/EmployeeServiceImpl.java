@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import error.EmployeeNotFoundException;
 import spring.model.Employee;
 import spring.model.dto.CreateEmployeeDTO;
 import spring.model.dto.UpdateEmployeeDTO;
@@ -27,13 +28,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public Employee findById(Long id) {
-		try {
-			return employeeRepository.findById(id).get();
-		} catch (Exception e) {
-			// TODO: handle exception
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-		}
-
+		Employee employee = employeeRepository.findById(id).orElseThrow(
+				() -> new EmployeeNotFoundException("Not found Employee with id: " + id));
+		return employee;
 	}
 
 	@Override
