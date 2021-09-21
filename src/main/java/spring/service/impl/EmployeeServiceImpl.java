@@ -2,12 +2,15 @@ package spring.service.impl;
 
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import spring.model.Employee;
+import spring.model.dto.CreateEmployeeDTO;
+import spring.model.dto.UpdateEmployeeDTO;
 import spring.repository.EmployeeRepository;
 import spring.service.EmployeeService;
 
@@ -15,6 +18,8 @@ import spring.service.EmployeeService;
 public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	@Autowired
+	private ModelMapper mapper;
 
 	public List<Employee> findAll() {
 		return employeeRepository.findAll();
@@ -32,9 +37,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public Employee create(Employee employee) {
+	public Employee create(CreateEmployeeDTO formData) {
 		try {
-			return employeeRepository.save(employee);
+			Employee newEmployee = new Employee();
+			mapper.map(formData, newEmployee);
+			return employeeRepository.save(newEmployee);
 		} catch (Exception e) {
 			// TODO: handle exception
 			throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -43,13 +50,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public Employee update(Long id, Employee employee) {
+	public Employee update(Long id, UpdateEmployeeDTO formData) {
 		if (checkExistEmployee(id) == false) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND,
 					"Employee does not exist");
 		}
-		employee.setId(id);
-		return employeeRepository.save(employee);
+		Employee updateEmployee = employeeRepository.getById(id);
+		mapper.map(formData, updateEmployee);
+
+		return employeeRepository.save(updateEmployee);
 
 	}
 

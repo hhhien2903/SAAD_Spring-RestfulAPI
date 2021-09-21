@@ -2,6 +2,8 @@ package spring.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import spring.model.Employee;
+import spring.model.dto.CreateEmployeeDTO;
+import spring.model.dto.UpdateEmployeeDTO;
 import spring.service.EmployeeService;
 
 @Controller
@@ -35,15 +39,16 @@ public class EmployeeController {
 	}
 
 	@PostMapping()
-	public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-		return new ResponseEntity<Employee>(employeeService.create(employee),
+	public ResponseEntity<Employee> createEmployee(
+			@RequestBody @Valid CreateEmployeeDTO formData) {
+		return new ResponseEntity<Employee>(employeeService.create(formData),
 				HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<Employee> updateEmployee(@PathVariable("id") Long id,
-			@RequestBody Employee employee) {
-		return new ResponseEntity<Employee>(employeeService.update(id, employee),
+			@RequestBody @Valid UpdateEmployeeDTO formData) {
+		return new ResponseEntity<Employee>(employeeService.update(id, formData),
 				HttpStatus.OK);
 	}
 
